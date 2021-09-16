@@ -7,6 +7,6 @@ namespace ConsoleCanvas.Core
     {
         (bool, IDrawRoutineParam, IEnumerable<DrawUnit>) Execute(IReadOnlyCanvas2D canvas, Dimension2D dimension, string command);
 
-        void Undo(ICanvas2D canvas, IDrawRoutineParam param);
+        void Undo(ICanvas2D canvas, IDrawRoutineParam param, IEnumerable<Point2D> previousCommandPoints);
     }
 }

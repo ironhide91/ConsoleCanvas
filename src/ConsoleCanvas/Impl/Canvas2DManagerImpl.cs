@@ -150,9 +150,12 @@ namespace ConsoleCanvas.Impl
                     return;
                 }
 
-                if (commandExecutors.ContainsKey(key))
+                var param = history.Pop();
+                history.TryPeek(out IDrawRoutineParam prevParam);
+
+                if (commandExecutors.ContainsKey(param.CommandKey))
                 {
-                    Undo(commandExecutors[key]);
+                    Undo(commandExecutors[param.CommandKey], param, prevParam?.AssociatedPoints);
                     return;
                 }
             }
@@ -214,12 +217,10 @@ namespace ConsoleCanvas.Impl
             console.NewLine();
         }
 
-        private void Undo(ICommandExecutor executor)
-        {
-            var param = history.Pop();
-            
+        private void Undo(ICommandExecutor executor, IDrawRoutineParam param, IEnumerable<Point2D> previousCommandPoints)
+        {            
             Logger.Info("Reverting ...");
-            executor.Undo(canvas, param);
+            executor.Undo(canvas, param, previousCommandPoints);
             Logger.Info("Reverted");
             Logger.Info("Rendering ...");
             Render();
@@ -250,7 +251,7 @@ namespace ConsoleCanvas.Impl
             {
                 console.Write(string.Format("|{0:00}|", y));
 
-                for (int x = 1; x <= currentDimension.Width; x++)
+                for (int x = 1; x < currentDimension.Width; x++)
                 {
                     var point = new Point2D(x, y);
 
@@ -258,13 +259,25 @@ namespace ConsoleCanvas.Impl
                     {
                         console.Write(" ");
                         console.Write(unitsToDraw[point]);
-                        console.Write("|");
+                        console.Write(" ");
                         continue;
                     }
 
-                    console.Write("  |");
+                    console.Write("   ");
                 }
 
+                var lastPointInRow = new Point2D(currentDimension.Width, y);
+                if (unitsToDraw.ContainsKey(lastPointInRow))
+                {
+                    console.Write(" ");
+                    console.Write(unitsToDraw[lastPointInRow]);
+                }
+                else
+                {
+                    console.Write("  ");
+                }
+
+                console.Write("|");
                 console.NewLine();
             }
 

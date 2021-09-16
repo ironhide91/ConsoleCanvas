@@ -75,9 +75,9 @@ namespace ConsoleCanvas.Impl.Executor
             return (false, default, default);
         }
 
-        public void Undo(ICanvas2D canvas, IDrawRoutineParam param)
+        public void Undo(ICanvas2D canvas, IDrawRoutineParam param, IEnumerable<Point2D> previousCommandPoints)
         {
-            undo?.Undo(canvas, (T)param);
+            undo?.Undo(canvas, (T)param, previousCommandPoints);
         }
     }
 }
