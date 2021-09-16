@@ -1,7 +1,10 @@
 ﻿using ConsoleCanvas.Core;
 using ConsoleCanvas.Impl.Parameter;
+using ConsoleCanvas.Impl.Validator;
+using ConsoleCanvas.Impl.DrawRoutine;
 using Pidgin;
 using static Pidgin.Parser;
+using ConsoleCanvas.Impl.Undo;
 
 namespace ConsoleCanvas.Impl.Parser
 {
@@ -14,6 +17,10 @@ namespace ConsoleCanvas.Impl.Parser
             parsed = result.Success ? result.Value : null;
 
             return result.Success;
+
+            ICore core = null;
+            core.LineParser().TryParse(null, out _);
+
         }
 
         private static readonly Parser<char, LineCommandParameter> parser =
@@ -26,4 +33,6 @@ namespace ConsoleCanvas.Impl.Parser
                 Not(AnyCharExcept(' '))
             );
     }
+
+    
 }
