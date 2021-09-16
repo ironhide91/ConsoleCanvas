@@ -9,11 +9,8 @@ namespace ConsoleCanvas.Runner
         static void Main(string[] args)
         {
             var builder = new CanvasManagerBuilder();
-
             ICanvas2DManager canvasManager = builder.Build();
-
             canvasManager.Run();
-
             Console.ReadLine();
         }
     }
