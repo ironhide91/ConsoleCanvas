@@ -96,7 +96,5 @@ namespace ConsoleCanvas.Impl.DrawRoutine
 
             queue.Enqueue(point);
         }
-
-        
     }
 }
