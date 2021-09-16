@@ -19,7 +19,7 @@ namespace ConsoleCanvas.Impl.Undo
                 {
                     if (hasOverlapWithPrevious
                         && previousPoints.Contains(point)
-                        && set[point].Value != canvas.DefaultDrawValue)
+                        && set[point].Value != canvas.EmptyDrawValue)
                     {
                         continue;
                     }

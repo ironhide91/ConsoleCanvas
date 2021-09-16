@@ -4,6 +4,8 @@ using ConsoleCanvas.Impl.Parser;
 using ConsoleCanvas.Impl.Validator;
 using ConsoleCanvas.Impl.DrawRoutine;
 using ConsoleCanvas.Impl.Undo;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace ConsoleCanvas.Impl
 {
@@ -11,12 +13,12 @@ namespace ConsoleCanvas.Impl
     {
         public CanvasManagerBuilder()
         {
-            manager = new Canvas2DManagerImpl();
-
             manager.SetCommandIdentifier(new CommandIdentifier());
 
             WithConsole(new ConsoleImpl());
             WithCanvas2D(new Canvas2D(' ', 'X', 0, 7, new Point2DComparer()));
+
+            manager.SetUndo(new UndoPreviousCommand());
 
             WithCanvasDrawCommand(
                 new CanvasCommandExecutor(
@@ -53,10 +55,14 @@ namespace ConsoleCanvas.Impl
             );
         }
 
-        private readonly Canvas2DManagerImpl manager;
+        private readonly Canvas2DManagerImpl manager = new Canvas2DManagerImpl();
+
+        private readonly Dictionary<string, ICommandExecutor> commandExecutors =
+            new Dictionary<string, ICommandExecutor>();
 
         public ICanvas2DManager Build()
         {
+            manager.SetCommandExecutors(new ReadOnlyDictionary<string, ICommandExecutor>(commandExecutors));
             manager.BuildKnowKeys();
             manager.CommandIdentifier.BuildIdentifiers(manager.KnownKeys);
             return manager;
@@ -82,7 +88,13 @@ namespace ConsoleCanvas.Impl
 
         public CanvasManagerBuilder RegisterCommandExecutor(ICommandExecutor executor)
         {
-            manager.RegisterCommandExecutor(executor);
+            if (commandExecutors.ContainsKey(executor.CommandKey))
+            {
+                commandExecutors[executor.CommandKey] = executor;
+                return this;
+            }
+
+            commandExecutors.Add(executor.CommandKey, executor);
             return this;
         }        
     }

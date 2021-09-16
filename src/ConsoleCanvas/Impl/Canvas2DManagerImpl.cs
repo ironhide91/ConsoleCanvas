@@ -14,16 +14,16 @@ namespace ConsoleCanvas.Impl
 
         #region Private Fields
         private readonly Dimension2D maxDimension;
-        private readonly Dictionary<string, ICommandExecutor> commandExecutors =
-            new Dictionary<string, ICommandExecutor>();
 
+        private IReadOnlyDictionary<string, ICommandExecutor> commandExecutors;
         private IConsole console;
         private ICanvas2D canvas;
-        private Dimension2D currentDimension;
-        private bool canvasInitialized = false;
         private IDrawCanvasCommand drawCanvasCommand;
+        private IUndoPreviousCommand undoPreviousCommand;
+
+        private Dimension2D currentDimension;
+        private bool canvasInitialized = false;        
         private HashSet<string> knownKeys = new HashSet<string>(10);
-        private readonly Stack<IDrawRoutineParam> history = new Stack<IDrawRoutineParam>(10);
         #endregion
 
         internal IReadOnlySet<string> KnownKeys { get { return knownKeys; } }
@@ -38,7 +38,7 @@ namespace ConsoleCanvas.Impl
         internal void SetCanvas2D(ICanvas2D canvas)
         {
             this.canvas = canvas;
-        }        
+        }
 
         internal void SetCommandIdentifier(ICommandIdentifier commandIdentifier)
         {
@@ -50,12 +50,14 @@ namespace ConsoleCanvas.Impl
             drawCanvasCommand = command;
         }
 
-        internal void RegisterCommandExecutor(ICommandExecutor executor)
+        internal void SetUndo(IUndoPreviousCommand undoPreviousCommand)
         {
-            if (commandExecutors.ContainsKey(executor.CommandKey))
-                return;
+            this.undoPreviousCommand = undoPreviousCommand;
+        }
 
-            commandExecutors.Add(executor.CommandKey, executor);
+        internal void SetCommandExecutors(IReadOnlyDictionary<string, ICommandExecutor> commandExecutors)
+        {
+            this.commandExecutors = commandExecutors;
         }
 
         internal void BuildKnowKeys()
@@ -142,22 +144,9 @@ namespace ConsoleCanvas.Impl
 
             if (key == Constants.UndoKey)
             {
-                Logger.Info("Receieved undo command");
-
-                if (history.Count == 0)
-                {
-                    Logger.Info("Nothing to revert");
-                    return;
-                }
-
-                var param = history.Pop();
-                history.TryPeek(out IDrawRoutineParam prevParam);
-
-                if (commandExecutors.ContainsKey(param.CommandKey))
-                {
-                    Undo(commandExecutors[param.CommandKey], param, prevParam?.AssociatedPoints);
-                    return;
-                }
+                undoPreviousCommand.Undo(canvas, commandExecutors);
+                Render();
+                return;
             }
 
             if (commandExecutors.ContainsKey(key))
@@ -165,8 +154,6 @@ namespace ConsoleCanvas.Impl
                 Draw(commandExecutors[key], command);
                 return;
             }
-
-            return;
         }
 
         private void Canvas(string command)
@@ -205,14 +192,12 @@ namespace ConsoleCanvas.Impl
             if (!result.Item1)
                 return;
             
-            history.Push(result.Item2);
+            undoPreviousCommand.Record(result.Item2);
             Logger.Info("Drawing ...");
             canvas.Draw(result.Item3);
             result.Item2.AssociatedPoints = result.Item3.Select(s => s.Coordinate).ToList();
             Logger.Info("Drawn");
-            Logger.Info("Rendering ...");
             Render();
-            Logger.Info("Rendered");
             console.Write($"Actual DrawUnits [{canvas.Get().Count}] Canvas [{currentDimension.Width * currentDimension.Height}]");
             console.NewLine();
         }
@@ -231,6 +216,7 @@ namespace ConsoleCanvas.Impl
 
         private void Render()
         {
+            Logger.Info("Rendering ...");            
             console.NewLine();
             console.Write($"Canvas [{currentDimension.Width} X {currentDimension.Height}]");
             console.NewLine();
@@ -281,7 +267,8 @@ namespace ConsoleCanvas.Impl
                 console.NewLine();
             }
 
-            console.NewLine();            
+            console.NewLine();
+            Logger.Info("Rendered");
         }
 
         private void Close()
