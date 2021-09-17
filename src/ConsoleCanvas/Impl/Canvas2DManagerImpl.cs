@@ -110,7 +110,7 @@ namespace ConsoleCanvas.Impl
                 var input = console.ReadLine();
                 Logger.Info($"Input receieved - {input}");
 
-                if (!string.IsNullOrEmpty(input) && (input.Trim() == Constants.QuitKey))
+                if (!string.IsNullOrEmpty(input) && (input.Trim().ToUpperInvariant() == Constants.QuitKey))
                 {
                     Logger.Info("Receieved Quit command");
                     Logger.Info("Quiting ...");
@@ -132,7 +132,7 @@ namespace ConsoleCanvas.Impl
 
             if (key == null)
             {
-                Logger.Info("Receieved null command");
+                Logger.Error("Receieved unknown command");
                 return;
             }
 
@@ -148,7 +148,7 @@ namespace ConsoleCanvas.Impl
                 return;
             }
 
-            if (key == Constants.UndoKey)
+            if (key.Trim().ToUpperInvariant() == Constants.UndoKey)
             {
                 undoPreviousCommand.Undo(canvas, commandExecutors);
                 renderer.Render(canvas, console);
@@ -181,12 +181,10 @@ namespace ConsoleCanvas.Impl
             }
 
             Logger.Info("Receieved a valid Canvas command");
-            Logger.Info("Drawing ...");
+            Logger.Info($"Drawing {parsedCommand} ...");
             drawCanvasCommand.Draw(this, parsedCommand.Dimension);
             Logger.Info("Drawn");
             renderer.Render(canvas, console);
-            console.Write($"Actual DrawUnits [{canvas.Get().Count}] Canvas [{currentDimension.Width * currentDimension.Height}]");
-            console.NewLine();
         }
 
         private void Draw(ICommandExecutor executor, string command)
@@ -202,8 +200,6 @@ namespace ConsoleCanvas.Impl
             result.Item2.AssociatedPoints = result.Item3.Select(s => s.Coordinate).ToList();
             Logger.Info("Drawn");
             renderer.Render(canvas, console);
-            console.Write($"Actual DrawUnits [{canvas.Get().Count}] Canvas [{currentDimension.Width * currentDimension.Height}]");
-            console.NewLine();
         }
 
         private void Close()
