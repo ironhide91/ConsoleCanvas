@@ -18,7 +18,7 @@ namespace ConsoleCanvas.Impl.Parameter
 
         public override string ToString()
         {
-            return $"({Dimension.Width},{Dimension.Height})";
+            return $"[Width {Dimension.Width} | Height {Dimension.Height}]";
         }
     }
 }

@@ -34,7 +34,7 @@ namespace ConsoleCanvas.Impl
 
                 if (executors.ContainsKey(param.CommandKey))
                 {
-                    Logger.Info("Reverting ...");
+                    Logger.Info($"Reverting {param} ...");
                     executors[param.CommandKey].Undo(canvas, param, prevParam?.AssociatedPoints);
                     Logger.Info("Reverted");
                     return;

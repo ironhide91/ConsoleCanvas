@@ -8,7 +8,8 @@ namespace ConsoleCanvas.Impl.Executor
         public FillCommandExecutor(
             ICommandParser<FillCommandParameter> parser,
             ICommandValidator<FillCommandParameter> validator,
-            IDrawCommand<FillCommandParameter> drawer) : base(parser, validator, drawer)
+            IDrawCommand<FillCommandParameter> drawer,
+            IUndo<FillCommandParameter> undo) : base(parser, validator, drawer, undo)
         {
 
         }

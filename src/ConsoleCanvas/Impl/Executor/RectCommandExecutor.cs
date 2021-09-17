@@ -8,7 +8,8 @@ namespace ConsoleCanvas.Impl.Executor
         public RectCommandExecutor(
             ICommandParser<RectCommandParameter> parser,
             ICommandValidator<RectCommandParameter> validator,
-            IDrawCommand<RectCommandParameter> drawer) : base(parser, validator, drawer)
+            IDrawCommand<RectCommandParameter> drawer,
+            IUndo<RectCommandParameter> undo) : base(parser, validator, drawer, undo)
         {
 
         }

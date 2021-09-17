@@ -197,7 +197,7 @@ namespace ConsoleCanvas.Impl
                 return;
             
             undoPreviousCommand.Record(result.Item2);
-            Logger.Info("Drawing ...");
+            Logger.Info($"Drawing {result.Item2} ...");
             canvas.Draw(result.Item3);
             result.Item2.AssociatedPoints = result.Item3.Select(s => s.Coordinate).ToList();
             Logger.Info("Drawn");

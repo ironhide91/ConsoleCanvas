@@ -17,5 +17,10 @@ namespace ConsoleCanvas.Impl.Parameter
         public string CommandKey { get { return Constants.RectKey; } }
         public IEnumerable<Point2D> AssociatedPoints { get; set; }
         public int BackgroundColorBeforeFill { get; set; }
+
+        public override string ToString()
+        {
+            return $"[Command {CommandKey} | UpperLeftPoint {UpperLeftPoint} | LowerRightPoint {LowerRightPoint}]";
+        }
     }
 }

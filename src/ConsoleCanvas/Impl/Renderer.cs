@@ -59,6 +59,7 @@ namespace ConsoleCanvas.Impl
 
             console.NewLine();
             Logger.Info("Rendered");
+            console.Write($"Actual DrawUnits [{canvas.Get().Count}] Canvas [{canvas.CurrentDimension.Width * canvas.CurrentDimension.Height}]");
         }
     }
 }

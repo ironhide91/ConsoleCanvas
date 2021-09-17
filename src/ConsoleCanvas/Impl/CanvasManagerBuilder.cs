@@ -45,14 +45,16 @@ namespace ConsoleCanvas.Impl
                 new RectCommandExecutor(
                     new RectCommandParser(),
                     new RectCommandValidator(),
-                    new RectDrawer())
+                    new RectDrawer(),
+                    new RectUndo())
             );
 
             RegisterCommandExecutor(
                 new FillCommandExecutor(
                     new FillCommandParser(),
                     new FillCommandValidator(),
-                    new FillDrawer())
+                    new FillDrawer(),
+                    new FillUndo())
             );
         }
 

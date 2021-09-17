@@ -11,16 +11,19 @@ namespace ConsoleCanvas.Impl.Executor
             ICommandParser<T> parser,
             ICommandValidator<T> validator,
             IDrawCommand<T> drawer,
-            IUndo<T> undo = null)
+            IUndo<T> undo)
         {
             if (parser == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(parser));
 
             if (validator == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(validator));
 
             if (drawer == null)
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(drawer));
+
+            if (undo == null)
+                throw new ArgumentNullException(nameof(undo));
 
             this.parser = parser;
             this.validator = validator;
