@@ -1,6 +1,5 @@
 ﻿using ConsoleCanvas.Core;
 using ConsoleCanvas.Impl;
-using System;
 
 namespace ConsoleCanvas.Runner
 {
