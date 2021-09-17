@@ -11,7 +11,6 @@ namespace ConsoleCanvas.Runner
             var builder = new CanvasManagerBuilder();
             ICanvas2DManager canvasManager = builder.Build();
             canvasManager.Run();
-            Console.ReadLine();
         }
     }
 }
