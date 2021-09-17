@@ -15,8 +15,9 @@ namespace ConsoleCanvas.Impl
         {
             manager.SetCommandIdentifier(new CommandIdentifier());
 
-            WithConsole(new ConsoleImpl());
-            WithCanvas2D(new Canvas2D(' ', 'X', 0, 7, new Point2DComparer()));
+            SetConsole(new ConsoleImpl());
+            SetRenderer(new Renderer());
+            SetCanvas2D(new Canvas2D(' ', 'X', 0, 7, new Point2DComparer()));
 
             manager.SetUndo(new UndoPreviousCommand());
 
@@ -68,17 +69,23 @@ namespace ConsoleCanvas.Impl
             return manager;
         }
 
-        public CanvasManagerBuilder WithConsole(IConsole console)
+        public CanvasManagerBuilder SetConsole(IConsole console)
         {
             manager.SetConsole(console);
             return this;
         }
         
-        public CanvasManagerBuilder WithCanvas2D(ICanvas2D canvas)
+        public CanvasManagerBuilder SetCanvas2D(ICanvas2D canvas)
         {
             manager.SetCanvas2D(canvas);
             return this;
-        }        
+        }
+
+        public CanvasManagerBuilder SetRenderer(IRender renderer)
+        {
+            manager.SetRenderer(renderer);
+            return this;
+        }
 
         public CanvasManagerBuilder WithCanvasDrawCommand(IDrawCanvasCommand draw)
         {

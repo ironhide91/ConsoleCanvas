@@ -18,6 +18,7 @@ namespace ConsoleCanvas.Impl
         private IReadOnlyDictionary<string, ICommandExecutor> commandExecutors;
         private IConsole console;
         private ICanvas2D canvas;
+        private IRender renderer;
         private IDrawCanvasCommand drawCanvasCommand;
         private IUndoPreviousCommand undoPreviousCommand;
 
@@ -48,6 +49,11 @@ namespace ConsoleCanvas.Impl
         internal void SetCanvasDrawCommand(IDrawCanvasCommand command)
         {
             drawCanvasCommand = command;
+        }
+
+        internal void SetRenderer(IRender renderer)
+        {
+            this.renderer = renderer;
         }
 
         internal void SetUndo(IUndoPreviousCommand undoPreviousCommand)
@@ -145,7 +151,7 @@ namespace ConsoleCanvas.Impl
             if (key == Constants.UndoKey)
             {
                 undoPreviousCommand.Undo(canvas, commandExecutors);
-                Render();
+                renderer.Render(canvas, console);
                 return;
             }
 
@@ -178,9 +184,7 @@ namespace ConsoleCanvas.Impl
             Logger.Info("Drawing ...");
             drawCanvasCommand.Draw(this, parsedCommand.Dimension);
             Logger.Info("Drawn");
-            Logger.Info("Rendering ...");
-            Render();
-            Logger.Info("Rendered");
+            renderer.Render(canvas, console);
             console.Write($"Actual DrawUnits [{canvas.Get().Count}] Canvas [{currentDimension.Width * currentDimension.Height}]");
             console.NewLine();
         }
@@ -197,78 +201,9 @@ namespace ConsoleCanvas.Impl
             canvas.Draw(result.Item3);
             result.Item2.AssociatedPoints = result.Item3.Select(s => s.Coordinate).ToList();
             Logger.Info("Drawn");
-            Render();
+            renderer.Render(canvas, console);
             console.Write($"Actual DrawUnits [{canvas.Get().Count}] Canvas [{currentDimension.Width * currentDimension.Height}]");
             console.NewLine();
-        }
-
-        private void Undo(ICommandExecutor executor, IDrawRoutineParam param, IEnumerable<Point2D> previousCommandPoints)
-        {            
-            Logger.Info("Reverting ...");
-            executor.Undo(canvas, param, previousCommandPoints);
-            Logger.Info("Reverted");
-            Logger.Info("Rendering ...");
-            Render();
-            Logger.Info("Rendered");
-            console.Write($"Actual DrawUnits [{canvas.Get().Count}] Canvas [{currentDimension.Width * currentDimension.Height}]");
-            console.NewLine();
-        }
-
-        private void Render()
-        {
-            Logger.Info("Rendering ...");            
-            console.NewLine();
-            console.Write($"Canvas [{currentDimension.Width} X {currentDimension.Height}]");
-            console.NewLine();
-            console.NewLine();
-
-            console.Write("|  ");
-            int xindex = 1;
-            for (int i = 0; i < CurrentDimension.Width; i++)
-            {
-                console.Write(string.Format("|{0:00}", xindex++));
-            }
-            console.Write("|");
-            console.NewLine();
-
-            var unitsToDraw = canvas.Get();
-
-            for (int y = 1; y <= currentDimension.Height; y++)
-            {
-                console.Write(string.Format("|{0:00}|", y));
-
-                for (int x = 1; x < currentDimension.Width; x++)
-                {
-                    var point = new Point2D(x, y);
-
-                    if (unitsToDraw.ContainsKey(point))
-                    {
-                        console.Write(" ");
-                        console.Write(unitsToDraw[point]);
-                        console.Write(" ");
-                        continue;
-                    }
-
-                    console.Write("   ");
-                }
-
-                var lastPointInRow = new Point2D(currentDimension.Width, y);
-                if (unitsToDraw.ContainsKey(lastPointInRow))
-                {
-                    console.Write(" ");
-                    console.Write(unitsToDraw[lastPointInRow]);
-                }
-                else
-                {
-                    console.Write("  ");
-                }
-
-                console.Write("|");
-                console.NewLine();
-            }
-
-            console.NewLine();
-            Logger.Info("Rendered");
         }
 
         private void Close()
